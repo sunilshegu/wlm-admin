@@ -10,7 +10,7 @@ function AppRouter() {
     return (
         <Router history={browserRoutingHistory}>
             <Switch>
-                <Route exact path={PATHS.DASHBOARD} component={Dashboard}/>
+                <Route path={PATHS.DASHBOARD} component={Dashboard}/>
                 <Route path={PATHS.ALL_USERS} component={All_Users}/>
                 <Route path={PATHS.LOGIN} component={Login}/>
                 <Route path={PATHS.HOME} component={Login}/>
