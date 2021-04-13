@@ -2,40 +2,25 @@ import React from 'react';
 import { Route, Router, Switch } from 'react-router';
 import { browserRoutingHistory } from '../../routing/history';
 import Sidebar from "../sidebar/sidebar.component";
+import Selfie from "../selfie/selfie.component";
+import Id from "../id/id.component";
+import Images from "./../images/images.component";
 
 interface RouterProps {
 }
-
-const Comp1 = () => {
-    return (
-        <div>Comp1---------------------------------------------------------------------------------------------------------------------------------------</div>
-    )
-}
-const Comp2 = () => {
-    return (
-
-        <div>Hai this is page 2</div>
-    )
-}
-const Comp3 = () => {
-    return (
-
-        <div>Hai this is page 3</div>
-    )
-}
-
 const Dashboard = (props: RouterProps) => {
     return (
         <div className='row'>
-            <div className='col-md-4'>
+            <div className='col-lg-2'>
                 <Sidebar />
             </div>
-            <div className='col-md-8'>
+
+            <div className='col-lg-6'>
                 <Router history={browserRoutingHistory}>
                     <Switch>
-                        <Route path={'/dashboard/comp1'} component={Comp1} />
-                        <Route path={'/dashboard/comp2'} component={Comp2} />
-                        <Route path={'/dashboard/comp3'} component={Comp3} />
+                        <Route path={'/dashboard/selfie'} component={Selfie} />
+                        <Route path={'/dashboard/id'} component={Id} />
+                        <Route path={'/dashboard/images'} component={Images} />
                     </Switch>
                 </Router>
             </div>
