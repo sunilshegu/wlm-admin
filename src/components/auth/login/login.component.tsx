@@ -1,94 +1,76 @@
-import React, { useEffect, useState } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { loginAction, loginFailedAction } from '../auth.actions';
+import { loginAction } from '../auth.actions';
 import { RouteProps } from 'react-router-dom';
-import { selectAuthErrorMessage } from '../auth.selectors';
-import { isValidEmail, isValidPassword } from '../../../helpers/validation.helpers';
 
 export interface LoginState {
     mobile: string;
-    otp: string;
-    prevPath?: string;
+    password: string;
+    error?: string;
 }
 
 interface DispatchProps {
     login: (data: LoginState) => void;
 }
 
-interface Validations {
-    mobile: boolean;
-    otp: boolean;
-}
+class Login extends React.Component<DispatchProps & RouteProps> {
+    state: LoginState = {
+        mobile: '',
+        password: '',
+        error: ''
+    };
 
-const Login = (props: DispatchProps & RouteProps) => {
-
-    const [mobile, setMobile] = useState('');
-    const [otp, setOTP] = useState('');
-    const [isValid, setValidations] = useState<Validations>({ mobile: true, otp: true });
-    const errorMessage = useSelector(selectAuthErrorMessage);
-
-    const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(loginFailedAction(null));
-    }, [dispatch]);
-
-    const setValidationsStatus = (value: string, key: string) => {
-        let status = true;
-        if (key === 'email') {
-            status = isValidEmail(value);
-        } else if (key === 'password') {
-            status = isValidPassword(value);
-        }
-        setValidations({ ...isValid, [key]: status });
-    }
-
-    const handleOnChange = (value: string, key: keyof Validations) => {
-        if (!isValid[key]) {
-            setValidationsStatus(value, key);
-        }
-
+    handleOnChange = (value: string, key: string): void => {
         if (key === 'mobile') {
-            setMobile(value);
-        } else if (key === 'otp') {
-            setOTP(value);
+            this.setState({ mobile: value })
+        } else if (key === 'password') {
+            this.setState({ password: value });
         }
     }
 
-    return (
-        <div className="row mt-5 align-middle">
+    submit = () => {
+        console.log(this.state.password, this.state.mobile)
+        this.props.login({
+            mobile: this.state.mobile,
+            password: this.state.password
+        })
+    }
+
+    render() {
+        return (
+            <div className="row mt-5 align-middle">
                 <form className="w-25 container mt-5 align-middle">
-                    
+
                     <h3 className="mt-5">
                         Login
 					    </h3>
-                        <span className="text-danger alert-danger">{errorMessage}</span>
+                    <span className="text-danger alert-danger">{this.state.error}</span>
                     <div>
                         <input id="mobile" placeholder='mobile' className='form-control mt-3' type="text"
-                            value={mobile}
-                            onChange={(e) => handleOnChange(e.target.value, 'mobile')} required />
+                            value={this.state.mobile}
+                            onChange={(e) => this.handleOnChange(e.target.value, 'mobile')} required />
                     </div>
 
                     <div>
-                        <input id="otp" placeholder='otp' className='form-control mt-3' type="password"
-                            value={otp}
-                            onChange={(e) => handleOnChange(e.target.value, 'otp')} required />
+                        <input id="password" placeholder='password' className='form-control mt-3' type="password"
+                            value={this.state.password}
+                            onChange={(e) => this.handleOnChange(e.target.value, 'password')} required />
                     </div>
-                    
+
                     <div className='text-center'>
                         <button id="submit" type='button' className='btn-info mt-3 px-2'
-                            disabled={!isValid.mobile || !isValid.otp || !mobile || !otp}
-                            onClick={() => props.login({ mobile, otp })}>Submit
+                            onClick={() => this.submit()}>Submit
                         </button>
                     </div>
                 </form>
-                </div>
-    )
+            </div>
+        )
+    };
 }
 
 const mapDispatchToProps = (dispatch: Dispatch): DispatchProps => ({
     login: (data: LoginState) => {
-        console.log('---login---')
         dispatch(loginAction(data))
     }
 })
