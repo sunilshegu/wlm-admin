@@ -1,8 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { loginAction } from '../auth.actions';
-import { RouteProps } from 'react-router-dom';
+import { loginAction, updateLoginError } from './auth.actions';
+import { AppState } from './../../redux/store';
+import { selectAuthErrorMessage } from './auth.selectors';
 
 export interface LoginState {
     mobile: string;
@@ -12,13 +13,17 @@ export interface LoginState {
 
 interface DispatchProps {
     login: (data: LoginState) => void;
+    updateLoginError: (message: string) => void;
 }
 
-class Login extends React.Component<DispatchProps & RouteProps> {
+interface StateProps {
+    error: string
+}
+
+class Login extends React.Component<DispatchProps & StateProps> {
     state: LoginState = {
         mobile: '',
         password: '',
-        error: ''
     };
 
     handleOnChange = (value: string, key: string): void => {
@@ -30,7 +35,7 @@ class Login extends React.Component<DispatchProps & RouteProps> {
     }
 
     submit = () => {
-        console.log(this.state.password, this.state.mobile)
+        this.props.updateLoginError('');
         this.props.login({
             mobile: this.state.mobile,
             password: this.state.password
@@ -45,7 +50,6 @@ class Login extends React.Component<DispatchProps & RouteProps> {
                     <h3 className="mt-5">
                         Login
 					    </h3>
-                    <span className="text-danger alert-danger">{this.state.error}</span>
                     <div>
                         <input id="mobile" placeholder='mobile' className='form-control mt-3' type="text"
                             value={this.state.mobile}
@@ -59,6 +63,9 @@ class Login extends React.Component<DispatchProps & RouteProps> {
                     </div>
 
                     <div className='text-center'>
+                        <div>
+                            <span className="text-danger alert-danger">{this.props.error}</span>
+                        </div>
                         <button id="submit" type='button' className='btn-info mt-3 px-2'
                             onClick={() => this.submit()}>Submit
                         </button>
@@ -70,9 +77,13 @@ class Login extends React.Component<DispatchProps & RouteProps> {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch): DispatchProps => ({
-    login: (data: LoginState) => {
-        dispatch(loginAction(data))
-    }
-})
+    login: (data: LoginState) => dispatch(loginAction(data)),
+    updateLoginError: (message: string) => dispatch(updateLoginError(message))
+    
+});
 
-export default connect(null, mapDispatchToProps)(Login);
+const mapStateToProps = (state: AppState): StateProps => ({
+    error: selectAuthErrorMessage(state)
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

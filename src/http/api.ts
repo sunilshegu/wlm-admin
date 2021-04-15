@@ -4,7 +4,7 @@ import { getAuthorizationToken } from './helpers';
 // intercepting the requests
 axios.interceptors.request.use((config) => {
     return {
-        ...config, baseURL: 'https://medical-project-admin.herokuapp.com', headers: {
+        ...config, baseURL: 'http://65.1.195.86:8000', headers: {
             ...config.headers, Authorization: getAuthorizationToken()
         }
     };

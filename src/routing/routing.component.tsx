@@ -2,7 +2,7 @@ import React from "react";
 import { browserRoutingHistory } from "./history";
 import { Route, Router, Switch } from "react-router-dom";
 import { PATHS } from "./routing.helpers";
-import Login from "../components/auth/login/login.component";
+import Login from "../components/auth/auth.component";
 import Dashboard from "../components/dashboard/dashboard.component";
 import All_Users from "../components/all-users/all-users.component";
 

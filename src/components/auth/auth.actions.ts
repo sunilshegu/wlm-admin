@@ -1,8 +1,11 @@
 import { createAction } from 'redux-actions';
-import { LoginState } from './login/login.component';
+import { LoginState } from './auth.component';
 
 export const LOGIN = 'LOGIN';
 export const loginAction = createAction<LoginState>(LOGIN);
+
+export const UPDATE_LOGIN_ERROR = 'UPDATE_LOGIN_ERROR';
+export const updateLoginError = createAction<string>(UPDATE_LOGIN_ERROR);
 
 export const LOGIN_FAILED = 'LOGIN_FAILED';
 export const loginFailedAction = createAction<string>(LOGIN_FAILED);

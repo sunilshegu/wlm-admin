@@ -3,7 +3,7 @@ import { Path } from 'path-parser';
 import { stringify } from 'querystring';
 import { postAPI } from './api';
 import { LOGIN_URL } from './urls';
-import { LoginState } from '../components/auth/login/login.component';
+import { LoginState } from '../components/auth/auth.component';
 
 // eslint-disable-next-line
 const getPathBuilder = (url: string) => {
