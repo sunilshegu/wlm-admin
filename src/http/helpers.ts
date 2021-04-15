@@ -1,4 +1,4 @@
-const AUTH_TOKEN_KEY = 'medical_auth_token';
+const AUTH_TOKEN_KEY = 'wlm_auth_token';
 
 export const getAuthorizationToken = () => {
   return window.sessionStorage.getItem(AUTH_TOKEN_KEY);
