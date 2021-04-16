@@ -1,5 +1,13 @@
-.custom-paginate.pagination > li {
-    border: 1px solid gray !important;
+a:not([href]):not([class]) {
+    color: inherit;
+    text-decoration: none;
     padding: 10px;
+    border: 1px solid gray;
 }
-
+.active
+{
+    color: red;
+}
+.modal-dialog {
+    max-width: 90% !important;
+}

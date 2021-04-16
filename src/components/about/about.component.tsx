@@ -3,12 +3,12 @@ import React from 'react';
 interface RouterProps {
 }
 
-const Images = () => {
+const About = () => {
     return (
         <div>
-           Images
+           About
         </div>
     )
 }
 
-export default Images;
+export default About;

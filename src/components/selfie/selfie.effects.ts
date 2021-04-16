@@ -1,11 +1,13 @@
 import { takeEvery, call, put } from 'redux-saga/effects';
 import { GET_SELFIE_USERS, updateSelfieUsers } from './selfie.actions';
 import { getSelfieUsersAPI } from './../../http/backend'
+import { Action } from 'redux-actions';
 
-function* getSelfieUsersEffect() {
+function* getSelfieUsersEffect(action: Action<Number>) {
+    console.log('action--->', action.payload)
     try {
         // @ts-ignore
-        const response = yield call(getSelfieUsersAPI, {params: {type: 'selfie', pageNo: 1}});
+        const response = yield call(getSelfieUsersAPI, {params: {type: 'selfie', pageNo: action.payload}});
         // console.log('response==>', response);
         yield put(updateSelfieUsers(response.data))
     } catch (_) {
