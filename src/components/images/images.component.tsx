@@ -5,7 +5,9 @@ interface RouterProps {
 
 const Images = () => {
     return (
-        <div>Images</div>
+        <div>
+           Images
+        </div>
     )
 }
 

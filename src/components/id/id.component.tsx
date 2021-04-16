@@ -1,11 +1,10 @@
 import React from 'react';
 
-interface RouterProps {
-}
-
 const Id = () => {
     return (
-        <div>id</div>
+        <div>
+           Images
+        </div>
     )
 }
 
