@@ -5,7 +5,7 @@ export const getAuthorizationToken = () => {
 }
 
 export const setAuthorizationToken = (token: string) => {
-  window.sessionStorage.setItem(AUTH_TOKEN_KEY, 'Bearer ' + token);
+  window.sessionStorage.setItem(AUTH_TOKEN_KEY, token);
 }
 
 export const removeAuthorizationToken = () => {

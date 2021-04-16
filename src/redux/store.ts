@@ -1,7 +1,8 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import { appSaga } from './effects';
-import { DashboardState, dashboardReducer } from '../components/dashboard/dashboard.reducer';
+import { selfieReducer, SelfieState, } from '../components/selfie/selfie.reducer';
+
 import { Action } from 'redux-actions';
 import { LOG_OUT } from '../components/auth/auth.actions';
 import { authReducer, AuthState } from '../components/auth/auth.reducer';
@@ -17,12 +18,12 @@ if (process.env.NODE_ENV === 'development') {
 
 export interface AppState {
     auth: AuthState,
-    dashboard: DashboardState,
+    selfie: SelfieState,
 };
 
 const appReducer = combineReducers({
     auth: authReducer,
-    dashboard: dashboardReducer,
+    selfie: selfieReducer,
 });
 
 const rootReducer = (state: AppState, action: Action<any>) => {
