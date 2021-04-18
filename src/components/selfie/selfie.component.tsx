@@ -2,15 +2,17 @@ import React from 'react';
 import { Dispatch } from 'redux';
 import ReactPaginate from 'react-paginate';
 import { connect } from 'react-redux';
-import { getSelfieUsers } from './selfie.actions';
-import { SelfieUser } from './selfie.types';
+import { approveSelfie, deleteImage, getSelfieUsers } from './selfie.actions';
+import { ApproveSelfie, DeleteImage, SelfieStatus, SelfieUser } from './selfie.types';
 import { selectSelfieUsersData } from './selfie.selectors';
 import { AppState } from '../../redux/store';
 import * as _ from 'underscore';
 import '../component.css'
 
 interface DispatchProps {
-    getUsers: (pageNo: number) => void;
+    getUsers: (pageNo: number) => void,
+    approveSelfie: (payload: ApproveSelfie) => void,
+    deleteImage: (payload: DeleteImage) => void,
 }
 
 interface StateProps {
@@ -28,7 +30,14 @@ class Selfie extends React.Component<DispatchProps & StateProps> {
             firstName: '',
             lastName: '',
             mobile: '',
-            images: []
+            images: [],
+            selfie: {
+                status: -1,
+                url: '',
+                poseId: {
+                    url: ''
+                }
+            }
         }
     }
 
@@ -42,6 +51,34 @@ class Selfie extends React.Component<DispatchProps & StateProps> {
 
     selectUser = (selectedUserId: string): void => {
         this.setState({ selectedUser: _.findWhere(this.props.usersData, { _id: selectedUserId }) });
+    }
+
+    approveSelfie = (selfieStatus: SelfieStatus): void => {
+        if (this.state.selectedUser?._id && selfieStatus) {
+            this.props.approveSelfie({ userId: this.state.selectedUser._id, selfieStatus });
+        }
+    }
+
+    deleteImage = (index: number): void => {
+        if (this.state.selectedUser?._id && this.state.selectedUser?.images.length && index < this.state.selectedUser.images.length) {
+            this.props.deleteImage({ userId: this.state.selectedUser._id, index });
+        }
+    }
+
+    getSelfieHTML = (userId: string, status: SelfieStatus): JSX.Element => {
+        if (status === SelfieStatus.PendingApproval) {
+            return (
+                <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#selfieModal" onClick={() => this.selectUser(userId)}>Selfie</button>
+            )
+        } else {
+            if (status === SelfieStatus.Approved) {
+                return <p>Approved</p>
+            } else if (status === SelfieStatus.Declined) {
+                return <p>Declined</p>
+            } else if (status === SelfieStatus.NotUploaded) {
+                return <p>Not Uploaded</p>
+            }
+        }
     }
 
     render(): JSX.Element {
@@ -59,28 +96,36 @@ class Selfie extends React.Component<DispatchProps & StateProps> {
                         </tr>
                     </thead>
 
-                    <tbody>
-                        {
-                            this.props.usersData.map((user, index) => (
-                                <tr key={index}>
-                                    <td>{user.firstName}</td>
-                                    <td>{user.lastName}</td>
-                                    <td>
-                                        <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#aboutModal" onClick={() => this.selectUser(user._id)}>About</button>
-                                    </td>
-                                    <td>
-                                        <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#selfieModal" onClick={() => this.selectUser(user._id)}>Selfie</button>
-                                    </td>
-                                    <td>
-                                        <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#photosModal" onClick={() => this.selectUser(user._id)}>Images</button>
-                                    </td>
-                                    <td>
-                                        <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#idModal" onClick={() => this.selectUser(user._id)}>Id</button>
-                                    </td>
-                                </tr>
-                            ))
-                        }
-                    </tbody>
+                    {
+                        !this.props.usersData.length ? <tr>No Users</tr> :
+                            <tbody>
+                                {
+                                    this.props.usersData.map((user, index) => {
+                                        return (
+                                            <tr key={index}>
+
+                                                <td>{user.firstName}</td>
+                                                <td>{user.lastName}</td>
+                                                <td>
+                                                    <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#aboutModal" onClick={() => this.selectUser(user._id)}>About</button>
+                                                </td>
+                                                <td>
+                                                    {this.getSelfieHTML(user._id, user.selfie.status)}
+                                                </td>
+                                                <td>
+                                                    <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#photosModal" onClick={() => this.selectUser(user._id)}>Images</button>
+                                                </td>
+                                                <td>
+                                                    <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#idModal" onClick={() => this.selectUser(user._id)}>Id</button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                }
+                            </tbody>
+
+
+                    }
                 </table>
 
                 <div className='custom-paginate'>
@@ -148,7 +193,6 @@ class Selfie extends React.Component<DispatchProps & StateProps> {
                             <div className="modal-body">
 
                                 <div>
-
                                     {/* name section */}
                                     <h3 className='text-center text-info'>
                                         {this.state.selectedUser.firstName} &nbsp; {this.state.selectedUser.lastName}
@@ -157,17 +201,16 @@ class Selfie extends React.Component<DispatchProps & StateProps> {
 
                                 <div>
                                     <div>
-                                        <img alt='User photos' className='img-size' src={this.state.selectedUser.images[0]} />
-                                        <img alt='User photos' className='img-size' src={this.state.selectedUser.images[0]} />
-                                        <div className="mt-3">
-                                            <button className="btn btn-danger pull-right ml-4 mr-5">Decline</button>
-                                            <button className="btn btn-info pull-right">Approve</button>
+                                        <img alt='User photos' className='img-size' src={this.state.selectedUser?.images[0]} />
+                                        <img alt='User photos' className='img-size' src={this.state.selectedUser?.selfie?.url} />
+                                        <img alt='User photos' className='img-size' src={this.state.selectedUser?.selfie?.poseId?.url} />
+                                        <div className="mt-3 pull-right">
+                                            <button className="btn btn-info" onClick={() => this.approveSelfie(SelfieStatus.Approved)}>Approve</button>
+                                            <button className="btn btn-danger" onClick={() => this.approveSelfie(SelfieStatus.Declined)}>Decline</button>
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -182,6 +225,7 @@ class Selfie extends React.Component<DispatchProps & StateProps> {
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
+
                             <div className="modal-body">
                                 <div>
                                     {/* name section */}
@@ -195,58 +239,23 @@ class Selfie extends React.Component<DispatchProps & StateProps> {
                                         <table>
                                             <tbody>
                                                 <tr>
-                                                    <td>
-                                                        <img alt='User photos' className='img-size' src={this.state.selectedUser.images[0]} />
-                                                        <button className="btn btn-danger ml-5 mt-3">Decline</button>
-                                                        <button className="btn btn-info ml-2 mt-3">Approve</button>
-                                                    </td>
-                                                    <td>
-                                                        <img alt='User photos' className='img-size' src={this.state.selectedUser.images[0]} />
-                                                        <button className="btn btn-danger ml-5 mt-3">Decline</button>
-                                                        <button className="btn btn-info ml-2 mt-3">Approve</button>
-                                                    </td>
-                                                    <td>
-                                                        <img alt='User photos' className='img-size' src={this.state.selectedUser.images[0]} />
-                                                        <button className="btn btn-danger ml-5 mt-3">Decline</button>
-                                                        <button className="btn btn-info ml-2 mt-3">Approve</button>
-                                                    </td>
-                                                    <td>
-                                                        <img alt='User photos' className='img-size' src={this.state.selectedUser.images[0]} />
-                                                        <button className="btn btn-danger ml-5 mt-3">Decline</button>
-                                                        <button className="btn btn-info ml-2 mt-3">Approve</button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <img alt='User photos' className='img-size' src={this.state.selectedUser.images[0]} />
-                                                        <button className="btn btn-danger ml-5 mt-3">Decline</button>
-                                                        <button className="btn btn-info ml-2 mt-3">Approve</button>
-                                                    </td>
-                                                    <td>
-                                                        <img alt='User photos' className='img-size' src={this.state.selectedUser.images[0]} />
-                                                        <button className="btn btn-danger ml-5 mt-3">Decline</button>
-                                                        <button className="btn btn-info ml-2 mt-3">Approve</button>
-                                                    </td>
-                                                    <td>
-                                                        <img alt='User photos' className='img-size' src={this.state.selectedUser.images[0]} />
-                                                        <button className="btn btn-danger ml-5 mt-3">Decline</button>
-                                                        <button className="btn btn-info ml-2 mt-3">Approve</button>
-                                                    </td>
+                                                    {
+                                                        this.state.selectedUser.images.map((eachImage, index) => (
+                                                            <td key={index}>
+                                                                <img alt='User photos' className='img-size' src={eachImage} />
+                                                                <button className="btn btn-danger ml-5 mt-3" onClick={() => { this.deleteImage(index) }}>Delete</button>
+                                                            </td>
+                                                        ))
+                                                    }
                                                 </tr>
                                             </tbody>
                                         </table>
-
-
                                     </div>
                                 </div>
-
                             </div>
-
                         </div>
                     </div>
                 </div>
-
-
 
 
                 {/* ID model html */}
@@ -285,9 +294,6 @@ class Selfie extends React.Component<DispatchProps & StateProps> {
                         </div>
                     </div>
                 </div>
-
-
-
             </div>
         );
     }
@@ -295,6 +301,8 @@ class Selfie extends React.Component<DispatchProps & StateProps> {
 
 const mapDispatchToProps = (dispatch: Dispatch): DispatchProps => ({
     getUsers: (pageNo: number) => dispatch(getSelfieUsers(pageNo)),
+    approveSelfie: (payload: ApproveSelfie) => dispatch(approveSelfie(payload)),
+    deleteImage: (payload: DeleteImage) => dispatch(deleteImage(payload)),
 });
 
 const mapStateToProps = (state: AppState): StateProps => ({

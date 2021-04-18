@@ -29,3 +29,7 @@ export const putAPI = async <B, R>(url: string, body: B, config: AxiosRequestCon
 export const deleteAPI = async <B, R>(url: string, config: AxiosRequestConfig = {}): Promise<R> => {
     return axios.delete(url, config).then((resp) => resp.data);
 };
+
+export const patchAPI = async <B, R>(url: string, body: B, config: AxiosRequestConfig = {}): Promise<R> => {
+    return axios.patch(url, body, config).then((resp) => resp.data);
+};
