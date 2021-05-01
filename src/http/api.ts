@@ -4,7 +4,7 @@ import { getAuthorizationToken } from './helpers';
 // intercepting the requests
 axios.interceptors.request.use((config) => {
     return {
-        ...config, baseURL: 'http://localhost:8000', headers: {
+        ...config, baseURL: 'http://app.wavelengthmatch.com', headers: {
             ...config.headers, Authorization: getAuthorizationToken()
         }
     };
